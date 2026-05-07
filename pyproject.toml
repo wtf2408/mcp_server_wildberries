@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcp-server-wildberries"
+description = "MCP server and CLI for Wildberries Seller API"
+requires-python = ">=3.10"
+dynamic = ["version"]
+dependencies = [
+    "mcp>=1.0.0",
+    "requests>=2.28.0",
+]
+
+[project.scripts]
+mcp-server-wildberries = "mcp_server_wildberries:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "mcp_server_wildberries.__version__" }
+
+[tool.setuptools]
+package-dir = { "mcp_server_wildberries" = "." }
+packages = ["mcp_server_wildberries", "mcp_server_wildberries.tools"]
