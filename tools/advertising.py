@@ -143,6 +143,15 @@ def wb_advert_minus_phrases_set(params_json: str) -> str:
     return _j(_get_api().set_advert_minus_phrases(json.loads(params_json)))
 
 
+@mcp.tool()
+def wb_advert_search_clusters_list(params_json: str) -> str:
+    """Active/inactive search cluster lists (POST /adv/v0/normquery/list).
+
+    Body: items[{advertId, nmId}] per WB docs; snake_case advert_id/nm_id accepted.
+    """
+    return _j(_get_api().get_advert_normquery_list(json.loads(params_json)))
+
+
 # ── Finance ─────────────────────────────────────────────────────────
 
 @mcp.tool()
@@ -184,3 +193,31 @@ def wb_advert_search_stats(params_json: str) -> str:
     Body: from, to, items[{advertId, nmId}] per WB docs; snake_case advert_id/nm_id accepted.
     """
     return _j(_get_api().get_advert_search_stats(json.loads(params_json)))
+
+
+@mcp.tool()
+def wb_advert_search_stats_v0(params_json: str) -> str:
+    """Search cluster statistics, v0 aggregate format (POST /adv/v0/normquery/stats).
+
+    Body: from, to, items[{advert_id, nm_id}] per WB docs; camelCase advertId/nmId accepted.
+    """
+    return _j(_get_api().get_advert_normquery_stats_v0(json.loads(params_json)))
+
+
+@mcp.tool()
+def wb_advert_campaign_fullstats(campaign_ids_json: str, begin_date: str, end_date: str) -> str:
+    """Campaign statistics for a date range (GET /adv/v3/fullstats).
+
+    Args:
+      campaign_ids_json — JSON array [1,2,3] or comma-separated string (max 50 ids).
+      begin_date, end_date — YYYY-MM-DD (query beginDate/endDate).
+    """
+    raw = campaign_ids_json.strip()
+    if raw.startswith("["):
+        ids_list = json.loads(raw)
+        if not isinstance(ids_list, list):
+            raise TypeError("campaign_ids_json array must be a JSON list of integers")
+        ids = ",".join(str(int(i)) for i in ids_list[:50])
+    else:
+        ids = raw
+    return _j(_get_api().get_advert_campaign_fullstats(ids, begin_date, end_date))

@@ -465,6 +465,12 @@ def main(argv: list[str] | None = None):
     p = sub.add_parser("advert-minus-phrases-set", help="Set negative phrases")
     p.add_argument("params_json")
 
+    p = sub.add_parser(
+        "advert-search-clusters-list",
+        help="Active/inactive search cluster lists (POST /adv/v0/normquery/list)",
+    )
+    p.add_argument("params_json")
+
     sub.add_parser("advert-balance", help="Get advertising account balance")
 
     p = sub.add_parser("advert-budget", help="Get advertising campaign budget")
@@ -487,6 +493,23 @@ def main(argv: list[str] | None = None):
         help="Search cluster statistics with daily breakdown (POST /adv/v1/normquery/stats)",
     )
     p.add_argument("params_json")
+
+    p = sub.add_parser(
+        "advert-search-stats-v0",
+        help="Search cluster statistics aggregate v0 (POST /adv/v0/normquery/stats)",
+    )
+    p.add_argument("params_json")
+
+    p = sub.add_parser(
+        "advert-campaign-fullstats",
+        help="Campaign statistics for date range (GET /adv/v3/fullstats)",
+    )
+    p.add_argument(
+        "campaign_ids_json",
+        help='JSON array [1,2,3] or comma-separated campaign ids (max 50)',
+    )
+    p.add_argument("begin_date", help="YYYY-MM-DD")
+    p.add_argument("end_date", help="YYYY-MM-DD")
 
     # ── Communications ─────────────────────────────────────────────────
 
@@ -933,12 +956,19 @@ def main(argv: list[str] | None = None):
         "advert-search-bids-delete": lambda: server.wb_advert_search_bids_delete(args.params_json),
         "advert-minus-phrases": lambda: server.wb_advert_minus_phrases(args.params_json),
         "advert-minus-phrases-set": lambda: server.wb_advert_minus_phrases_set(args.params_json),
+        "advert-search-clusters-list": lambda: server.wb_advert_search_clusters_list(args.params_json),
         "advert-balance": lambda: server.wb_advert_balance(),
         "advert-budget": lambda: server.wb_advert_budget(args.campaign_id),
         "advert-budget-deposit": lambda: server.wb_advert_budget_deposit(args.campaign_id, args.amount),
         "advert-cost-history": lambda: server.wb_advert_cost_history(args.date_from, args.date_to),
         "advert-payments": lambda: server.wb_advert_payments(args.date_from, args.date_to),
         "advert-search-stats": lambda: server.wb_advert_search_stats(args.params_json),
+        "advert-search-stats-v0": lambda: server.wb_advert_search_stats_v0(args.params_json),
+        "advert-campaign-fullstats": lambda: server.wb_advert_campaign_fullstats(
+            args.campaign_ids_json,
+            args.begin_date,
+            args.end_date,
+        ),
         # Communications
         "new-feedbacks-questions": lambda: server.wb_new_feedbacks_questions(),
         "questions-unanswered-count": lambda: server.wb_questions_unanswered_count(),

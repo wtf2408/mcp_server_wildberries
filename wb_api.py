@@ -770,6 +770,59 @@ class WildberriesAPI:
         payload = {"from": params["from"], "to": params["to"], "items": items_out}
         return self._post("advert", "/adv/v1/normquery/stats", payload)
 
+    def get_advert_normquery_stats_v0(self, params: dict) -> dict:
+        """Статистика поисковых кластеров без дневной детализации (POST /adv/v0/normquery/stats).
+
+        Тело: from, to, items[] с полями advert_id и nm_id (допускаются advertId и nmId).
+        """
+        items_out: list[dict] = []
+        for row in params["items"]:
+            aid = row.get("advert_id")
+            if aid is None:
+                aid = row.get("advertId")
+            nid = row.get("nm_id")
+            if nid is None:
+                nid = row.get("nmId")
+            if aid is None or nid is None:
+                raise ValueError(
+                    "each items row must include advert_id/advertId and nm_id/nmId",
+                )
+            items_out.append({"advert_id": int(aid), "nm_id": int(nid)})
+        payload = {**params, "items": items_out}
+        return self._post("advert", "/adv/v0/normquery/stats", payload)
+
+    def get_advert_normquery_list(self, params: dict) -> dict:
+        """Списки активных и неактивных поисковых кластеров (POST /adv/v0/normquery/list).
+
+        Тело: items[] с полями advertId и nmId (допускаются advert_id и nm_id).
+        """
+        items_out: list[dict] = []
+        for row in params["items"]:
+            aid = row.get("advertId")
+            if aid is None:
+                aid = row.get("advert_id")
+            nid = row.get("nmId")
+            if nid is None:
+                nid = row.get("nm_id")
+            if aid is None or nid is None:
+                raise ValueError(
+                    "each items row must include advertId/advert_id and nmId/nm_id",
+                )
+            items_out.append({"advertId": int(aid), "nmId": int(nid)})
+        payload = {**params, "items": items_out}
+        return self._post("advert", "/adv/v0/normquery/list", payload)
+
+    def get_advert_campaign_fullstats(self, ids: str, begin_date: str, end_date: str) -> dict | list:
+        """Статистика кампаний за период (GET /adv/v3/fullstats).
+
+        ids — строка ID кампаний через запятую (до 50). begin_date, end_date — YYYY-MM-DD.
+        """
+        return self._get(
+            "advert",
+            "/adv/v3/fullstats",
+            params={"ids": ids, "beginDate": begin_date, "endDate": end_date},
+        )
+
     # ── Communications (Feedbacks & Questions) ──────────────────────
 
     def get_new_feedbacks_questions(self) -> dict:
